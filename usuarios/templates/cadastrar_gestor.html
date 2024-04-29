@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block 'body' %}
+
+<div class="container">
+    <br>
+            <h1>Cadastrar Gestor</h1>
+            <form action="{% url 'cadastrar_gestor' %}" method="POST">{% csrf_token %}
+                <br>
+                <label>Nome</label>
+                <input type="text" placeholder="Digite o seu nome" name="nome" class="form-control">
+                <br>
+                <label>Username</label>
+                <input type="text" placeholder="Digite o seu CPF..." name="username" class="form-control">
+                <br>
+                <label>Password</label>
+                <input type="password" placeholder= "Digite uma senha..." name="password" class="form-control">
+                <br>
+                <input button type="submit" class="btn btn-primary"></button>
+            </form>
+        </div>
+    </div>
+    {% endblock %}

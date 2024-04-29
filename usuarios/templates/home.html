@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block 'body' %} 
+    <div class="container">
+        <br>
+        <h1>Home</h1>
+        <br>
+        <p>Olá seja bem-vindo a home da agenda!</p>
+        <br>
+        <a href="{% url 'usuarios:nome' %}">Nome</a>.
+        <a href="{% url 'usuarios:usuarios' %}">Usuarios</a>.
+        <a href="{% url 'usuarios:grupos' %}">Grupos</a>.
+        <a href="{% url 'usuarios:logout' %}">Logout</a>.
+    </div>
+{% endblock %}
