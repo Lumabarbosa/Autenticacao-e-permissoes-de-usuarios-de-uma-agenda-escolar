@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block 'body' %} 
+
+    <div class="container">
+        <br>
+        <h1>Logout</h1>
+        <br>
+        <p>Você foi deslogado com sucesso. Você pode 
+        <a href="{% url 'login' %}">logar novamente</a>.</p>
+    </div>
+
+{% endblock %}
+

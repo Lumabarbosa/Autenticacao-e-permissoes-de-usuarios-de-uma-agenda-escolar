@@ -10,8 +10,8 @@
                 </div>
             {% endfor %}
         {% endif %}
-        <h1>Alterar Dados</h1>
-            <form action="{% url 'editar_aluno' %}" method="POST">{% csrf_token %}
+        <h1>Editar Aluno</h1>
+            <form action="{% url 'editar_aluno' aluno.username %}" method="POST">{% csrf_token %}
                 <br>
                 <label>Nome</label>
                 <input type="text" placeholder="Digite o seu nome" name="nome" class="form-control">
@@ -42,19 +42,15 @@
                 </thead>
                 <tbody>
                     <div class="row">
-                    {% for aluno in alunos%}
+                    {% for aluno in users %}
                         <div class="col-md">
                         <tr>
-                            <th>{{aluno.nome}}</th>
+                            <th>{{aluno.name}}</th>
+                            <td>{{aluno.username}}</td>
+                            <td>{{aluno.escola}}</td>
                             <td>{{aluno.turma}}</td>
-                            <td>{{aluno.cpf}}</td>
-                            <td>{% if not aluno.last_login %}
-                                    Primeiro acesso
-                                {% else %}
-                                    {{aluno.last_login}}
-                                {% endif %}
                             </td>
-                            <td><a href="{% url 'editar_aluno' aluno.cpf %}"class="btn btn-danger">Alterar</a></td>
+                            <td><a href="{% url 'editar_aluno' user.cpf %}"class="btn btn-danger">Editar</a></td>
                         </tr>
                     {% endfor %}
                     </div>

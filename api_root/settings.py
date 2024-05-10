@@ -28,10 +28,10 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    #'rolepermissions',
+    'rolepermissions',
     'cpf_field',
-    #'rest_framework',
-    #"corsheaders",
+    'rest_framework',
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
@@ -116,9 +116,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'templates/static'),)
-STATIC_ROOT = os.path.join('static')
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
+#STATIC_ROOT = os.path.join('static')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -134,6 +132,10 @@ AUTH_USER_MODEL='usuarios.CustomUser'
 
 ROLEPERMISSIONS_MODULE = 'api_root.roles'
 #ROLEPERMISSIONS_REGISTER_ADMIN = True
+
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'login'
 
 #messages
 MESSAGE_TAGS = {

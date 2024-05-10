@@ -4,16 +4,17 @@ from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
 from rest_framework.response import Response
 from rest_framework import status
-choices_cargo = (('G', 'Gestor'),
-                    ('A', 'Aluno'))
 
+
+choices_cargo = (('G', 'gestor'),
+                    ('A', 'aluno'))
 
 class CustomUser(AbstractUser):
     
     nome = models.CharField(max_length=150, null=True, blank=False, default='')
     username = CPFField(primary_key=True, null=False, blank=False, help_text='Informe o CPF sem pontos ou traços', default='00000000000')
     escola = models.CharField(max_length=100, null=True, blank=True)
-    turma = models.CharField(max_length=10)
+    turma = models.CharField(max_length=30)
     cargo = models.CharField(max_length=1, choices=choices_cargo, default='')
     password = models.CharField(max_length=150, null=False, blank=False, default='')
     

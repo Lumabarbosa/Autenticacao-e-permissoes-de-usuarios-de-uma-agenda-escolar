@@ -1,12 +1,15 @@
 from django.http import HttpResponse
 import imaplib
-from rolepermissions.decorators import has_permission_decorator
+from rolepermissions.decorators import has_permission_decorator, has_role_decorator
 from .forms import CustomUserChangeForm, CustomUserCadastroForm
 from .models import CustomUser
 from rest_framework.decorators import api_view
 from rest_framework import status
 from django.shortcuts import get_object_or_404, render, redirect #redireciona para uma página -> espera url
-from django.contrib.auth import authenticate, login 
+from django.contrib.auth import authenticate
+from django.contrib import auth
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User, Group
 from django.contrib import auth, messages
 from .admin import CustomUserAdmin
 from django.urls import reverse # passar o nome da url e ele faz a transformação para o caminho
@@ -15,24 +18,34 @@ from rest_framework.response import Response
 from django.contrib import messages
 from django.views import View
 from .models import CustomUser
+from django.urls import reverse_lazy
 
-# Create your views here.
+from usuarios.signals import define_permissoes
+from rolepermissions.roles import assign_role, get_user_roles
+from rolepermissions.permissions import grant_permission
+from django.contrib.auth import get_user_model
+from django.views import generic
+
+def get_queryset(self):
+    return super(CustomUserAdmin).get_queryset()
+
+
 def home(request):
-    users = CustomUser.objects.all()
-    return render(request, 'home.html', {'users': users})
+    #grant_permission(request.user, 'login')
+    print(get_user_roles(request.user))
+    return render(request, "home.html")
 
-# CADASTRAR  (CREATE) ALUNO, TESTADO OK
+# CADASTRAR  (CREATE) ALUNO,  c/ permissões, TESTADO OK
 @has_permission_decorator('cadastrar_aluno')
 def cadastrar_aluno(request):
     if request.method == 'GET':
-        alunos = CustomUser.objects.filter(cargo='A') # select * from CustomUser where cargo = 'A'
-        return render(request, 'cadastrar_aluno.html', {'alunos': alunos})
-    if request.method == 'POST':
+            alunos = CustomUser.objects.filter(cargo='A')
+            return render(request, 'cadastrar_aluno.html', {'alunos': alunos})
+    if request.method == 'POST' or request.method == 'FILES':
         nome = request.POST.get('nome')
         username = request.POST.get('username')
         password = request.POST.get('password')
         escola = request.POST.get('escola')
-        turma = request.POST.get('turma')
         
         user = CustomUser.objects.filter(username=username)
         
@@ -40,17 +53,18 @@ def cadastrar_aluno(request):
                 #messages.error(request, "Este CPF, do aluno, já é registrado.")
             return HttpResponse("CPF já registrado.")
             
-        user = CustomUser.objects.create(nome=nome, username=username, password=password, cargo='A', escola=escola, turma=turma)
-        # TODO: confirmar o redirecionar com uma mensagem
-        
-        return HttpResponse("Cadastro realizado com sucesso!")
+        user = CustomUser.objects.create(nome=nome, username=username, password=password, cargo='A', escola=escola) 
+        user.save()
+        #messages.success(request, "Cadastro realizado com sucesso!")
+        return HttpResponse("Cadastro de aluno realizado com sucesso!")
 
+# CADASTRAR  (CREATE) Gestor c/ permissões, TESTADO OK
 @has_permission_decorator('cadastrar_gestor')
 def cadastrar_gestor(request):
     if request.method == 'GET':
-        gestor = CustomUser.objects.filter(cargo='G')
-        return render(request, 'cadastrar_gestor.html', {'gestor': gestor})
-    if request.method == 'POST':
+        gestores = CustomUser.objects.filter(cargo='G')
+        return render(request, 'cadastrar_gestor.html', {'gestores': gestores})
+    if request.method == 'POST' or request.method == 'FILES':
         nome = request.POST.get('nome')
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -67,42 +81,30 @@ def cadastrar_gestor(request):
         #messages.success(request, "Cadastro realizado com sucesso!")
         return HttpResponse("Cadastro de gestor realizado com sucesso!")
 
-# TESTADO OK
-def login(request):
-    if request.method == 'GET':
-        if request.user.is_authenticated:
-            #return redirect(reverse('home'))
-            return render(request, 'login.html')
-    elif request.method == 'POST':
-        login = request.POST.get('username')
-        password = request.POST.get('password')
+@has_role_decorator('aluno', 'gestor')
+class SignUpView(generic.CreateView):
+    form_class = CustomUserCadastroForm
+    success_url = reverse_lazy("login")
+    template_name = "registration/signup.html"
 
-        user = authenticate(username=login, password=password)
-
-        if not user:
-            #TODO: redirecionar com msg de erro
-            return HttpResponse("CPF ou senha inválido.")
-
-        auth.login(request, user)
-        messages.add_message(request, messages.SUCCESS, 'Login realizado com sucesso!')
-        return redirect(reverse('home'))
 
 def logout(request):
     request.session.flush()
     return redirect(reverse('login'))
 
+
 # LER (READ)
 # LISTAR ALUNOS, 
 @has_permission_decorator('cadastrar_aluno')
 def listar_alunos(request):
-    aluno = CustomUser.objects.filter(cargo='A')
-    return render(request, 'listar_alunos.html', {'aluno': aluno})
+    alunos = CustomUser.objects.filter(cargo='A')
+    return render(request, 'listar_alunos.html', {'alunos': alunos})
 
 # LISTAR GESTORES, 
 @has_permission_decorator('cadastrar_aluno')
 def listar_gestores(request):
-    gestor = CustomUser.objects.filter(cargo='G')
-    return render(request, 'listar_gestores.html', {'gestor': gestor})
+    gestores = CustomUser.objects.filter(cargo='G')
+    return render(request, 'listar_gestores.html', {'gestores': gestores})
 
 
 # EDITAR (UPDATE)
@@ -111,7 +113,7 @@ def editar_aluno(request, username):
     aluno = get_object_or_404(CustomUser, username=username)
     if request.method == 'GET':
         form = CustomUserChangeForm(instance=aluno)
-        return render(request, '(?).html', {'form': form, 'aluno': aluno})
+        return render(request, 'cadastrar_aluno.html', {'form': form, 'aluno': aluno})
     elif request.method == 'POST':
         form = CustomUserChangeForm(request.POST or None, instance=aluno)
         if form.is_valid():
@@ -119,7 +121,7 @@ def editar_aluno(request, username):
             messages.add_message(request, messages.SUCCESS, 'Aluno atualizado com sucesso!')
             return redirect(reverse('cadastrar_aluno'))
         else:
-            return render(request, '(?).html', {'form': form, 'aluno': aluno})
+            return render(request, 'cadastrar_aluno.html', {'form': form, 'aluno': aluno})
 
 #Dúvida: Em "return render(request, '(?).html', {'form': form, 'aluno': aluno})" direciona para "cadastrar_aluno.html"?
 #Em else: " return render(request, '(?).html', {'form': form, 'aluno': aluno})"direciona para "cadastrar_aluno.html"?
@@ -151,7 +153,10 @@ def incluir_aluno(request):
 @has_permission_decorator('cadastrar_aluno')
 def excluir_aluno(request, username):
     aluno = get_object_or_404(CustomUser, username=username)
+    print("passei exc 1")
     if request.method == 'POST':
+        print("passei exc 2")
         aluno.delete()
+        print("passei exc 3")
         messages.add_message(request, messages.SUCCESS, 'Aluno excluído com sucesso!')
     return redirect(reverse('cadastrar_aluno'))

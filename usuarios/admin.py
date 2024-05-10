@@ -43,7 +43,7 @@ class CustomUserAdmin(auth_admin_django.UserAdmin):
         form = CsvUserForm(request.POST, request.FILES)
         print("passo 2")
            
-        if request.method == "POST":
+        if request.method == "POST" or request.method == "FILES":
             csv_file = request.FILES["csv_upload"]
             
             if not csv_file.name.endswith('.csv'):

@@ -1,5 +1,15 @@
 {% extends "base.html" %}
-
+{% block content %} 
+{% if user.is_authenticated %}
+  Olá {{ user.username }}!
+  <form action="{% url 'logout' %}" method="POST">
+    {% csrf_token %}
+    <button type="submit">Log Out</button>
+  </form>
+{% else %}
+  <p>Você não está logado</p> 
+  <a href="{% url 'login' %}">Login</a> 
+{% endif %} 
 {% block 'body' %} 
     <div class="container">
         <br>
@@ -7,9 +17,9 @@
         <br>
         <p>Olá seja bem-vindo a home da agenda!</p>
         <br>
-        <a href="{% url 'usuarios:nome' %}">Nome</a>.
-        <a href="{% url 'usuarios:usuarios' %}">Usuarios</a>.
-        <a href="{% url 'usuarios:grupos' %}">Grupos</a>.
-        <a href="{% url 'usuarios:logout' %}">Logout</a>.
+        <p>Para acessar as funcionalidades da agenda, clique no menu acima.</p>
+        <br>
+        <a href="{% url 'logout' %}">logout</a> 
     </div>
+{% endblock %}
 {% endblock %}

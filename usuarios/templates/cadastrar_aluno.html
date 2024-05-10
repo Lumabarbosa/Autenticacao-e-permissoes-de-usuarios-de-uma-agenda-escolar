@@ -19,6 +19,15 @@
                 <label>Username</label>
                 <input type="text" placeholder="Digite o seu CPF..." name="username" class="form-control">
                 <br>
+                <label>Escola</label>
+                <input type="text" placeholder="Nome da Escola" name="escola" class="form-control">
+                <br>
+                <label>Turma</label>
+                <input type="text" placeholder="Digite a sua turma..." name="turma" class="form-control">
+                <br>
+                <label>Cargo</label>
+                <input type="text" placeholder="Digite 'aluno' ou 'gestor'." name="cargo" class="form-control">
+                <br>
                 <label>Password</label>
                 <input type="password" placeholder= "Digite uma senha..." name="password" class="form-control">
                 <br>
@@ -31,36 +40,25 @@
                 <thead>
                     <tr>
                         <th scope="col">Nome</th>
-                        <th scope="col">Turma</th>
                         <th scope="col">Username</th>
-                        <th scope="col">Último login</th>
+                        <th scope="col">Escola</th>
+                        <th scope="col">Turma</th>
                         <th scope="col">Editar</th>
                         <th scope="col">Excluir</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for aluno in alunos%}
+                    {% for aluno in alunos %}
                         <tr>
-                            <th>{{aluno.name}}</th>
-                            <td>{{aluno.turma}}</td>
+                            <th>{{aluno.nome}}</th>
                             <td>{{aluno.username}}</td>
-                            <td>{% if not aluno.last_login %}
-                                    Primeiro acesso
-                                {% else %}
-                                    {{aluno.last_login}}
-                                {% endif %}
-                            </td>
+                            <td>{{aluno.escola}}</td>
+                            <td>{{aluno.turma}}</td>
                             <td><a href="{% url 'editar_aluno' aluno.username %}" class="btn btn-primary">Editar</a></td>
-                            <td><a href="{% url 'excluir_aluno' aluno.username %}" class="btn btn-danger">Excluir</a></td>
-                            
+                            <td><a href="{% url 'excluir_aluno' aluno.username %}" class="btn btn-danger">Excluir</a></td>   
                         </tr>
-                    {% endfor %}
-                  
+                    {% endfor %} 
                 </tbody>
               </table>
-
-              <!-- Botão para incluir aluno -->
-              <a href="{% url 'incluir_aluno' %}" class="btn btn-primary">Incluir Aluno</a>
-
     </div>
 {% endblock %}
