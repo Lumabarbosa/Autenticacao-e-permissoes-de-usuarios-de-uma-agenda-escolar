@@ -1,14 +1,15 @@
-# AgendaSeducFinal
-## Back-end Autenticação e permissões de usuários
+# Back-end da Autenticação e permissões de usuários da Agenda Escolar para Seduc-PE
 
-Este projeto foi feito com:
+## Descrição 
 
-https://www.python.org/
+Este projeto é uma agenda escolar elaborada com o intuito de realizar a autenticação do usuário no banco de dados a partir do cpf do aluno digitado pelo próprio aluno ou responsável no login, ou através da importação de um arquivo csv através de usuário 'gestor'.
 
-https://www.djangoproject.com/
+## Instalação
 
-https://www.django-rest-framework.org/
-
+- Python 3.12.
+- Django.
+- Crie um amviente virtual.
+- Bibliotecas Python: django, rest-framework, role-permissions, openpyxl, sqlparse.
 
 ### Como rodar o projeto?
 
@@ -29,9 +30,7 @@ https://www.django-rest-framework.org/
     - python manage.py makemigrations
     - python manage.py migrate
 
-
 - python manage.py createsuperuser (já foi criado), as credenciais estão em um arquvo txt na pasta do projeto.
-
 
 ### Links de consulta
 
